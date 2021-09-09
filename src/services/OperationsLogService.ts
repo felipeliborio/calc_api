@@ -1,4 +1,5 @@
 import { database } from '../config/knex';
+import { v4 as uuid } from 'uuid';
 
 interface IList {
   userId?: string;
@@ -31,8 +32,42 @@ class OperationsLogService {
     });
   }
 
-  async make(operation: string, ) {
+  private async store(operation: string, result: string, userId: string): Promise<any> {
+    database('operations_log')
+    .insert({
+      id: uuid(),
+      user_id: userId,
+      operation,
+      result
+    });
+  }
 
+  async make(operation: string, userId: string) {
+    return new Promise((resolve, reject) => {
+      const result = this.calculate(operation);
+      this.store(operation, result.value ?? result.message, userId);
+      if (result.status === 1) {
+        return resolve(result);
+      }
+      reject(result);
+    });
+  }
+
+  private calculate(operation: string): any {
+    try {
+      
+
+      return {
+        status: 1,
+        value: 1
+      };
+    } catch (e: any) {
+      return {
+        status: -1,
+        message: 'Invalid operation:' + e.message,
+        code: 400
+      };
+    }
   }
 }
 

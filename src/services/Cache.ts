@@ -131,7 +131,7 @@ class Cache {
     });
   }
 
-  static get(key: string) {
+  static get(key: string): Promise<any> {
     return new Promise((resolve, reject) => {
       let operation = Cache.initOperation(reject);
 
