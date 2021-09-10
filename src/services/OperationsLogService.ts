@@ -76,7 +76,6 @@ class OperationsLogService {
           weights.push([weight, i]);
         }
       }
-
       weights.sort((a, b) => {
         return a[0] - b[0];
       });
@@ -144,17 +143,17 @@ class OperationsLogService {
       '/': (a: number,b:number): number => a/b,
     }
 
-    const first = () => {
+    let first = (() => {
       let i;
-      for (i = index; i >= 0; --i) {
+      for (i = index-1; i > 0; --i) {
         if (isNaN(Number(expression.charAt(i)))) {
           break;
         }
       }
       return Number(expression.slice(i, index));
-    }
+    })();
 
-    const second = () => {
+    let second = (() => {
       let i;
       for (i = index+1; i < expression.length; ++i) {
         if (isNaN(Number(expression.charAt(i)))) {
@@ -162,7 +161,7 @@ class OperationsLogService {
         }
       }
       return Number(expression.slice(index+1, i + 1));
-    }
+    })();
     
     return expression.replace(
       `${first}${expression.charAt(index)}${second}`, 

@@ -3,16 +3,13 @@ import { OperationsLogService } from '../services/OperationsLogService';
 import { Cache } from '../services/Cache';
 
 class OperationsLogController {
-  private operationsLogService: OperationsLogService;
-  constructor() {
-    this.operationsLogService = new OperationsLogService;
-  }
-
   async make(req: Request, res: Response): Promise<Response> {
     try {
+      const operationsLogService = new OperationsLogService;
       const operation = req.body.operation;
-      const { userId } = await Cache.get(req.headers['x-access-token'] as string);
-      const response = await this.operationsLogService.make(operation, userId as string);
+      // const { userId } = await Cache.get(req.headers['x-access-token'] as string);
+      const userId = '0';
+      const response = await operationsLogService.make(operation, userId as string);
       return res.json(response);
     } catch (e: any) {
       return res.status(e.code ?? 500).json({
@@ -23,7 +20,8 @@ class OperationsLogController {
 
   async list(req: Request, res: Response): Promise<Response> {
     try {
-      const response = await this.operationsLogService.list(req.query);
+      const operationsLogService = new OperationsLogService;
+      const response = await operationsLogService.list(req.query);
       return res.json(response);
     } catch (e: any) {
       return res.status(e.code ?? 500).json({
