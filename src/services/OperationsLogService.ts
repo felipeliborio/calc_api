@@ -53,13 +53,44 @@ class OperationsLogService {
     });
   }
 
-  private calculate(operation: string): any {
+  private calculate(expression: string): any {
     try {
-      
+      this.validate(expression);
 
+      const weights = [];
+      let modifier = 0;
+      for (let i = 0; i < expression.length; ++i) {
+        let weight = 0;
+
+        if (['+', '-'].includes(expression.charAt(i))) {
+          weight = modifier + 1;
+        } else if (['*', '/'].includes(expression.charAt(i))) {
+          weight = modifier + 2; 
+        } else if (expression.charAt(i) == '(') {
+          ++modifier;
+        } else if (expression.charAt(i) == ')') {
+          --modifier;
+        }
+
+        if (weight > 0) {
+          weights.push([weight, i]);
+        }
+      }
+
+      weights.sort((a, b) => {
+        return a[0] - b[0];
+      });
+
+      while(weights.length) {
+        const oldLenght = expression.length;
+        expression = this.calculateAt(expression, weights[0][1]);
+        this.updateWeights(weights, oldLenght - expression.length);
+        weights.shift();
+      }
+      
       return {
         status: 1,
-        value: 1
+        result: Number(expression)
       };
     } catch (e: any) {
       return {
@@ -67,6 +98,81 @@ class OperationsLogService {
         message: 'Invalid operation:' + e.message,
         code: 400
       };
+    }
+  }
+
+  private validate(expression: string) {
+    if (!expression.length) {
+      throw { message: 'empty operation' }
+    }
+
+    if (!/[0-9+\-*/()]/g.test(expression)) {
+      throw { message: 'contains invalid characters' };
+    }
+
+    let weight = 0;
+    for (let i = 0; i < expression.length ; ++i) {
+      if (expression.charAt(i) == '(') {
+        ++weight;
+      } else if (expression.charAt(i) == ')') {
+        --weight;
+      }
+
+      if (weight < 0) {
+        break;
+      }
+      
+      if (
+        i > 0 
+        && expression.charAt(i) == expression.charAt(i - 1)
+        && ['+', '-', '*', '/'].includes(expression.charAt(i))
+      ) {
+        throw { message: 'invalid operand at position'+ i};
+      }
+    }
+
+    if (weight != 0) {
+      throw { message: 'the parentheses are not matching' }
+    }
+  }
+
+  private calculateAt(expression: string, index: number): string {
+    const operations: any = {
+      '+': (a: number,b:number): number => a+b,
+      '-': (a: number,b:number): number => a-b,
+      '*': (a: number,b:number): number => a*b,
+      '/': (a: number,b:number): number => a/b,
+    }
+
+    const first = () => {
+      let i;
+      for (i = index; i >= 0; --i) {
+        if (isNaN(Number(expression.charAt(i)))) {
+          break;
+        }
+      }
+      return Number(expression.slice(i, index));
+    }
+
+    const second = () => {
+      let i;
+      for (i = index+1; i < expression.length; ++i) {
+        if (isNaN(Number(expression.charAt(i)))) {
+          break;
+        }
+      }
+      return Number(expression.slice(index+1, i + 1));
+    }
+    
+    return expression.replace(
+      `${first}${expression.charAt(index)}${second}`, 
+      operations[expression.charAt(index)](first, second)
+    );
+  }
+
+  private updateWeights(weights: any[], shift: number ) {
+    for (let i in weights) {
+      weights[i][1] -= shift;
     }
   }
 }
