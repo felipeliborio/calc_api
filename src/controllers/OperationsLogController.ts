@@ -20,9 +20,13 @@ class OperationsLogController {
 
   async list(req: Request, res: Response): Promise<Response> {
     try {
-      const operationsLogService = new OperationsLogService;
-      const response = await operationsLogService.list(req.query);
-      return res.json(response);
+      if (req.headers['x-user-type'] === 'admin') {
+        const operationsLogService = new OperationsLogService;
+        const response = await operationsLogService.list(req.query);
+        return res.json(response);
+      } else {
+        throw { status: -1, code: 401, message: 'Unauthorized!' };
+      }
     } catch (e: any) {
       return res.status(e.code ?? 500).json({
         message: e.message ?? 'error'
