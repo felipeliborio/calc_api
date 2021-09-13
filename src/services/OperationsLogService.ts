@@ -77,14 +77,18 @@ class OperationsLogService {
         }
       }
       weights.sort((a, b) => {
-        return a[0] - b[0];
+        return b[0] - a[0];
       });
 
       while(weights.length) {
         const oldLenght = expression.length;
         expression = this.calculateAt(expression, weights[0][1]);
+        console.log(expression)
+        console.log(weights)
         this.updateWeights(weights, oldLenght - expression.length);
+        console.log(weights)
         weights.shift();
+        console.log(weights)
       }
       
       return {
@@ -160,9 +164,10 @@ class OperationsLogService {
           break;
         }
       }
-      return Number(expression.slice(index+1, i + 1));
+      
+      return Number(expression.slice(index+1, i));
     })();
-    
+
     return expression.replace(
       `${first}${expression.charAt(index)}${second}`, 
       operations[expression.charAt(index)](first, second)

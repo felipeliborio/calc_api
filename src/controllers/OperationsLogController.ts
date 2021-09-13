@@ -7,8 +7,7 @@ class OperationsLogController {
     try {
       const operationsLogService = new OperationsLogService;
       const operation = req.body.operation;
-      // const { userId } = await Cache.get(req.headers['x-access-token'] as string);
-      const userId = '0';
+      const { userId } = await Cache.get(req.headers['x-access-token'] as string);
       const response = await operationsLogService.make(operation, userId as string);
       return res.json(response);
     } catch (e: any) {
