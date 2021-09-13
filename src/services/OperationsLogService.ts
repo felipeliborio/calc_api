@@ -66,17 +66,17 @@ class OperationsLogService {
         let weight = 0;
 
         if (['+', '-'].includes(expression.charAt(i))) {
-          weight = modifier + 1;
+          weight = 1;
         } else if (['*', '/'].includes(expression.charAt(i))) {
-          weight = modifier + 2; 
+          weight = 2; 
         } else if (expression.charAt(i) == '(') {
-          ++modifier;
+          modifier+=2;
         } else if (expression.charAt(i) == ')') {
-          --modifier;
+          modifier-=2;
         }
 
         if (weight > 0) {
-          weights.push([weight, i]);
+          weights.push([weight + modifier, i]);
         }
       }
       weights.sort((a, b) => {
