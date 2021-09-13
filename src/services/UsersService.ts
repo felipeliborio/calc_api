@@ -35,7 +35,7 @@ class UsersService {
 
       password = crypto.createHash('md5').update(password).digest("hex");
       database('users')
-      .select(['id', 'unername','type'])
+      .select(['id', 'username','type'])
       .where({
         username,
         password
