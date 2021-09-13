@@ -4,9 +4,13 @@ import { IUser, UsersService } from '../services/UsersService';
 class UsersController {
   async create(req: Request, res: Response): Promise<Response> {
     try {
-      const usersService = new UsersService;
-      const response = await usersService.create(req.body);
-      return res.json(response);
+      if (req.headers['x-user-type'] === 'admin') {
+        const usersService = new UsersService;
+        const response = await usersService.create(req.body);
+        return res.json(response);
+      } else {
+        throw { status: -1, code: 401, message: 'Unauthorized!' };
+      }
     } catch (e: any) {
       return res.status(e.code ?? 500).json({
         message: e.message ?? 'error'
@@ -58,9 +62,13 @@ class UsersController {
 
   async delete(req: Request, res: Response) {
     try {
-      const usersService = new UsersService;
-      const response = await usersService.delete(req.params?.id);
-      return res.json(response);
+      if (req.headers['x-user-type'] === 'admin') {
+        const usersService = new UsersService;
+        const response = await usersService.delete(req.params?.id);
+        return res.json(response);
+      } else {
+        throw {status: -1, code: 401, message: 'Unauthorized'};
+      }
     } catch (e: any) {
       return res.status(e.code ?? 500).json({
         message: e.message ?? 'error'
@@ -70,13 +78,17 @@ class UsersController {
 
   async changeType(req: Request, res: Response) {
     try {
-      const usersService = new UsersService;
-      const update: IUser = { 
-        id: req.params.id, 
-        type: req.body.type
-      };
-      const response = await usersService.changeType(update);
-      return res.json(response);
+      if (req.headers['x-user-type'] === 'admin') {
+        const usersService = new UsersService;
+        const update: IUser = { 
+          id: req.params.id, 
+          type: req.body.type
+        };
+        const response = await usersService.changeType(update);
+        return res.json(response);
+      } else {
+        throw {status: -1, code: 401, message: 'Unauthorized'};
+      }
     } catch (e: any) {
       return res.status(e.code ?? 500).json({
         message: e.message ?? 'error'
