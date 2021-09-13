@@ -64,6 +64,13 @@ class UsersService {
 
   async auth(token: string): Promise<any> {
     return new Promise((resolve, reject) => {
+      if (token === undefined) {
+        return reject({
+          status: -1,
+          code: 401,
+          message: 'The x-access-token was not sent'
+        });
+      }
       Cache.get(token)
       .then(session => {
         if (session) {

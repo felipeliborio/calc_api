@@ -12,9 +12,7 @@ class UsersController {
         throw { status: -1, code: 401, message: 'Unauthorized!' };
       }
     } catch (e: any) {
-      return res.status(e.code ?? 500).json({
-        message: e.message ?? 'error'
-      });
+      return res.status(e.code ?? 500).json(e);
     }
   }
 
@@ -24,9 +22,7 @@ class UsersController {
       const response = await usersService.login(req.body);
       return res.json(response);
     } catch (e: any) {
-      return res.status(e.code ?? 500).json({
-        message: e.message ?? 'error'
-      });
+      return res.status(e.code ?? 500).json(e);
     }
   }
 
@@ -38,9 +34,7 @@ class UsersController {
       req.headers['x-user-type'] = session.type;
       next();
     } catch (e: any) {
-      return res.status(e.code ?? 500).json({
-        message: e.message ?? 'error'
-      });
+      return res.status(e.code ?? 500).json(e);
     }
   }
 
@@ -54,9 +48,7 @@ class UsersController {
         throw { status: -1, code: 401, message: 'Unauthorized!' };
       }
     } catch (e: any) {
-      return res.status(e.code ?? 500).json({
-        message: e.message ?? 'error'
-      });
+      return res.status(e.code ?? 500).json(e);
     }
   }
 
@@ -70,9 +62,7 @@ class UsersController {
         throw {status: -1, code: 401, message: 'Unauthorized'};
       }
     } catch (e: any) {
-      return res.status(e.code ?? 500).json({
-        message: e.message ?? 'error'
-      });
+      return res.status(e.code ?? 500).json(e);
     }
   }
 
@@ -90,9 +80,7 @@ class UsersController {
         throw {status: -1, code: 401, message: 'Unauthorized'};
       }
     } catch (e: any) {
-      return res.status(e.code ?? 500).json({
-        message: e.message ?? 'error'
-      });
+      return res.status(e.code ?? 500).json(e);
     }
   }
 }
