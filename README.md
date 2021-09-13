@@ -9,7 +9,7 @@ Servidor Redis em execução (https://redis.io/)
 Caso o ambiente definido no .env não seja "development" é preciso também adicionar as credenciais 
 de um banco MySQL ao .env.
 
-Para iniciar o projeto é preciso primeiro executar o comando yarn install, em seguida, com o pacote knex instalado globalmente, deve se fazer as migrações do banco (knex migrate:latest) 
+Para iniciar o projeto é preciso primeiro executar o comando yarn install, em seguida, com o pacote knex instalado globalmente, deve se fazer as migrações do banco (knex migrate:latest, ou yarn knex migrate:latest para usar o knex relativo ao projeto) 
 e em seguida executar o projeto com yarn dev|start. Para executar o projeto com o comando yarn start 
 é preciso primeiro executar o comando yarn build.
 
