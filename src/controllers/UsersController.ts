@@ -17,7 +17,7 @@ class UsersController {
   async login(req: Request, res: Response): Promise<Response> {
     try {
       const usersService = new UsersService;
-      const response = usersService.login(req.body);
+      const response = await usersService.login(req.body);
       return res.json(response);
     } catch (e: any) {
       return res.status(e.code ?? 500).json({
@@ -30,8 +30,8 @@ class UsersController {
     try {
       const token = req.headers['x-access-token'] as string;
       const usersService = new UsersService;
-      const type: string = await usersService.auth(token);
-      req.headers['x-user-type'] = type;
+      const session = await usersService.auth(token);
+      req.headers['x-user-type'] = session.type;
       next();
     } catch (e: any) {
       return res.status(e.code ?? 500).json({
@@ -42,9 +42,13 @@ class UsersController {
 
   async list(req: Request, res: Response) {
     try {
-      const usersService = new UsersService;
-      const response = await usersService.list();
-      return res.json(response);
+      if (req.headers['x-user-type'] === 'admin') {
+        const usersService = new UsersService;
+        const response = await usersService.list();
+        return res.json(response);
+      } else {
+        throw { status: -1, code: 401, message: 'Unauthorized!' };
+      }
     } catch (e: any) {
       return res.status(e.code ?? 500).json({
         message: e.message ?? 'error'

@@ -2,6 +2,8 @@ import { database } from '../config/knex';
 import { v4 as uuid } from "uuid";
 import { Cache } from './Cache';
 
+const crypto = require('crypto');
+
 type UserType = 'admin' | 'user';
 interface IUser {
   id?: string;
@@ -10,11 +12,13 @@ interface IUser {
   type?: UserType;
 }
 
+//ao invés da senha aberta, recebe a senha criptografada
 class UsersService {
   async create({ username, password }: IUser) {
     return new Promise((resolve, reject) => {
       const id = uuid();
 
+      password = crypto.createHash('md5').update(password).digest("hex");
       database('users')
       .insert({ id, username, password })
       .then(r => {
@@ -27,17 +31,58 @@ class UsersService {
   }
 
   async login({ username, password }: IUser) {
+    return new Promise((resolve, reject) => {
 
+      password = crypto.createHash('md5').update(password).digest("hex");
+      database('users')
+      .select('type')
+      .where({
+        username,
+        password
+      })
+      .then(user => {
+        if (user[0]) {
+          const token: string = crypto.createHash('md5').update(`${username}${password}${new Date().toDateString()}`).digest("hex");
+          return Cache.set(token, user[0], 86400)
+          .then(status => {
+            if (status) {
+              return resolve({ status: 1, token });
+            }
+            reject({ status: -1, message: 'Failed to save user session' });
+          })
+          .catch(e => {
+            reject({ status: -1, message: 'Failed to save user session' });
+          });
+        }
+        reject({ status: -1, code: 401, message: 'username, password combination not found' });
+      })
+      .catch(e => {
+        reject({ status: -1, message: e.message });
+      });
+    });
   }
 
-  async auth(token: string): Promise<string> {
-    return 'admin';
+  async auth(token: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      Cache.get(token)
+      .then(session => {
+        if (session) {
+          Cache.setExp(token, 86400);
+          return resolve(session);
+        }
+        reject({ status: -1, message: 'The token is invalid or has expired' });
+      })
+      .catch(e => {
+        console.log(e)
+        reject({ status: -1, message: e.message });
+      });
+    });
   }
 
   async list() {
     return new Promise((resolve, reject) => {
       database('users')
-      .select('*')
+      .select(['id', 'username', 'type', 'created_at', 'updated_at'])
       .then(users => {
         resolve({ status: 1, users });
       })

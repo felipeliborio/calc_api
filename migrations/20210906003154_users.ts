@@ -27,7 +27,7 @@ export async function up(knex: Knex): Promise<void> {
   await knex.insert({
     id: '0',
     username: 'admin',
-    password: 'admin',
+    password: '21232f297a57a5a743894a0e4a801fc3',
     type: 'admin'
   }).into('users');
 }
