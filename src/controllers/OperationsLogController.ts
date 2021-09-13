@@ -7,8 +7,8 @@ class OperationsLogController {
     try {
       const operationsLogService = new OperationsLogService;
       const operation = req.body.operation;
-      const { userId } = await Cache.get(req.headers['x-access-token'] as string);
-      const response = await operationsLogService.make(operation, userId as string);
+      const user = await Cache.get(req.headers['x-access-token'] as string);
+      const response = await operationsLogService.make(operation, user.id as string);
       return res.json(response);
     } catch (e: any) {
       return res.status(e.code ?? 500).json({

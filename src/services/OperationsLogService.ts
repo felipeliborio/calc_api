@@ -39,13 +39,16 @@ class OperationsLogService {
       user_id: userId,
       operation,
       result
-    });
+    }).catch(e => {
+      console.log(e);
+    });;
   }
 
-  async make(operation: string, userId: string) {
-    return new Promise((resolve, reject) => {
+  async make(operation: string, userId: any) {
+    return new Promise(async (resolve, reject) => {
       const result = this.calculate(operation);
-      this.store(operation, result.value ?? result.message, userId);
+      this.store(operation, result.result ?? result.message, userId);
+      
       if (result.status === 1) {
         return resolve(result);
       }
