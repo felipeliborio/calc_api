@@ -83,12 +83,8 @@ class OperationsLogService {
       while(weights.length) {
         const oldLenght = expression.length;
         expression = this.calculateAt(expression, weights[0][1]);
-        console.log(expression)
-        console.log(weights)
         this.updateWeights(weights, oldLenght - expression.length);
-        console.log(weights)
         weights.shift();
-        console.log(weights)
       }
       
       return {
@@ -109,7 +105,7 @@ class OperationsLogService {
       throw { message: 'empty operation' }
     }
 
-    if (!/[0-9+\-*/()]/g.test(expression)) {
+    if (!/[0-9+\-*/()\.]/g.test(expression)) {
       throw { message: 'contains invalid characters' };
     }
 
@@ -128,7 +124,7 @@ class OperationsLogService {
       if (
         i > 0 
         && expression.charAt(i) == expression.charAt(i - 1)
-        && ['+', '-', '*', '/'].includes(expression.charAt(i))
+        && ['+', '-', '*', '/', '.'].includes(expression.charAt(i))
       ) {
         throw { message: 'invalid operand at position'+ i};
       }
@@ -150,7 +146,7 @@ class OperationsLogService {
     let first = (() => {
       let i;
       for (i = index-1; i > 0; --i) {
-        if (isNaN(Number(expression.charAt(i)))) {
+        if ('.' != expression.charAt(i) && isNaN(Number(expression.charAt(i)))) {
           break;
         }
       }
@@ -160,7 +156,7 @@ class OperationsLogService {
     let second = (() => {
       let i;
       for (i = index+1; i < expression.length; ++i) {
-        if (isNaN(Number(expression.charAt(i)))) {
+        if ('.' != expression.charAt(i) && isNaN(Number(expression.charAt(i)))) {
           break;
         }
       }
@@ -176,7 +172,7 @@ class OperationsLogService {
 
   private updateWeights(weights: any[], shift: number ) {
     for (let i in weights) {
-      weights[i][1] -= shift;
+      if (weights[i][1] > weights[0][1]) weights[i][1] -= shift;
     }
   }
 }
