@@ -83,15 +83,11 @@ class OperationsLogService {
         return b[0] - a[0];
       });
 
-      console.log(expression);
-      console.log(weights);
       while(weights.length) {
         const oldLenght = expression.length;
         expression = this.calculateAt(expression, weights[0][1]);
         this.updateWeights(weights, oldLenght - expression.length);
         weights.shift();
-        console.log(expression);
-        console.log(weights);
       }
       
       return {
