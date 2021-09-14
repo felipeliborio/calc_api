@@ -83,11 +83,15 @@ class OperationsLogService {
         return b[0] - a[0];
       });
 
+      console.log(expression);
+      console.log(weights);
       while(weights.length) {
         const oldLenght = expression.length;
         expression = this.calculateAt(expression, weights[0][1]);
         this.updateWeights(weights, oldLenght - expression.length);
         weights.shift();
+        console.log(expression);
+        console.log(weights);
       }
       
       return {
@@ -146,16 +150,22 @@ class OperationsLogService {
       '/': (a: number,b:number): number => a/b,
     }
 
+    let firstPosition = 0;
     let first = (() => {
       let i;
-      for (i = index-1; i > 0; --i) {
-        if ('.' != expression.charAt(i) && isNaN(Number(expression.charAt(i)))) {
+      for (i = index-1; i >= 0; --i) {
+        if (
+          '.' != expression.charAt(i) 
+          && Object.keys(operations).includes(expression.charAt(i))
+        ) {
           break;
         }
       }
-      return Number(expression.slice(i, index));
+      firstPosition = i+1;
+      return Number(expression.slice(i+1, index).replace('(', ''));
     })();
 
+    let secondPosition = 0;
     let second = (() => {
       let i;
       for (i = index+1; i < expression.length; ++i) {
@@ -164,11 +174,21 @@ class OperationsLogService {
         }
       }
       
-      return Number(expression.slice(index+1, i));
+      secondPosition = i;
+      return Number(expression.slice(index+1, i).replace(')', ''));
     })();
-
+    
+    let open = '';
+    let close = '';
+    if (
+      expression.charAt(firstPosition) == '('
+      && expression.charAt(secondPosition) == ')'
+    ) {
+      open = '(';
+      close = ')';
+    }
     return expression.replace(
-      `${first}${expression.charAt(index)}${second}`, 
+      `${open}${first}${expression.charAt(index)}${second}${close}`, 
       operations[expression.charAt(index)](first, second)
     );
   }
