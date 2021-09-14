@@ -182,7 +182,14 @@ class OperationsLogService {
     ) {
       open = '(';
       close = ')';
-    }
+    } 
+    
+    return expression.substr(0, firstPosition) 
+    + expression.substr(firstPosition).replace(
+      `${open}${first}${expression.charAt(index)}${second}${close}`, 
+      operations[expression.charAt(index)](first, second)
+    );
+
     return expression.replace(
       `${open}${first}${expression.charAt(index)}${second}${close}`, 
       operations[expression.charAt(index)](first, second)
