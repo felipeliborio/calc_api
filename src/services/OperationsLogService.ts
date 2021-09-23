@@ -7,6 +7,13 @@ interface IList {
   toDate?: string;
 }
 
+
+/*
+prepare result from 'select 4+6+(7*312)';
+execute result;
+
+usar isso para fazer os cálculos e simplificar o código
+*/
 class OperationsLogService {
   async list({ userId, fromDate, toDate }: IList) {
     return new Promise((resolve, reject) => {
